@@ -1,20 +1,24 @@
 <?xml version="1.0"?>
 <extension key="eu.tttp.qlookup" type="module">
   <file>qlookup</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
-  <license>FIXME</license>
+  <name>quick lookup for the autocomplete in the navigation</name>
+  <description>
+This extension improves the default search in several ways:
+- more efficient requests
+- search in the start of the names not in the middle (first or last)
+- adjust based on the lenght of the query and the number of results to do the query(ies) that are the most efficient
+  </description>
+  <license>aGPL3</license>
   <maintainer>
-    <author>FIXME</author>
-    <email>FIXME@example.com</email>
+    <author>xavier dutoit</author>
+    <email>civicrm@tttp.eu</email>
   </maintainer>
   <releaseDate>2012-10-28</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>4.2</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
   <civix>
     <namespace>CRM/Qlookup</namespace>
   </civix>
