@@ -19,25 +19,37 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
     return;//no navigation menu
   }
 
-$str = <<<'EOD'
+  $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1')."&cid=";
+  $str = 
+<<<'EOD'
 <script>
-cj (function($) {
-  $("#sort_name_navigation").crmAutocomplete({action:"getttpquick",selectFirst:false,autoField:false}, {
-    formatItem:function(data,i,max,value,term) {
-      if (typeof data["email"] != "undefined")
-        return data["sort_name"] + " : " + data["email"];
-      else
-        return data["sort_name"];
-    },
-    result:function(data){
-      if (data && data.id) {
-        document.location="/civicrm/contact/view?reset=1&cid="+data.id;
+(function($,url){
+  $(function(){
+    $("#sort_name_navigation").crmAutocomplete({action:"getttpquick"}, {
+      minChars:3,
+      formatItem:function(data,i,max,value,term) {
+        if (typeof data["email"] != "undefined")
+          return data["sort_name"] + " : " + data["email"];
+        else
+          return data["sort_name"];
+      },
+      result:function(data){
+        if (data && data.id) {
+          document.location=url+data.id;
+        }
+      }  
+    });
+    $('#id_search_block').submit (function() {
+      var q=$("#sort_name_navigation").val();
+      if (!isNaN(parseFloat(q)) && isFinite(q)) {
+        document.location=url+q;
+        return false;
       }
-    }  
+    });
   });
-});
-</script>
 EOD;
+  // wrapped in an anonymous fct that has cj and the contact view url as param
+  $str = $str."\n})(cj,'$url');</script>";
   $content = str_replace ("#sort_name_navigation","#disabled_by_qloockup",$content).$str;
 }
 
@@ -48,8 +60,7 @@ function  aaqlookup_civicrm_contactListQuery ( &$query, $name, $context, $id ) {
   // if nb words >2, skip the smallest
   if ($context == 'navigation') {
     $limit=11;
-    $fastSearchLimit = 3;
-    // ideally, the hook isn't on the query, but on the result, but that will be trivial to do when moving the autocomplete to the api
+
     // @TODO if the search result < 11 (the limit of the autocomplete, replace the query by LIKE '%name%)
     if (strlen ($name) > $fastSearchLimit) {
       $query = "(SELECT c.sort_name as data, c.id FROM civicrm_contact c WHERE is_deleted=0 AND c.sort_name LIKE '$name%' OR 
