@@ -22,7 +22,7 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
 $str = <<<'EOD'
 <script>
 cj (function($) {
-  $("#sort_name_navigation").crmAutocomplete({action:"getgoodquick",selectFirst:false,autoField:false}, {
+  $("#sort_name_navigation").crmAutocomplete({action:"getttpquick",selectFirst:false,autoField:false}, {
     formatItem:function(data,i,max,value,term) {
       if (typeof data["email"] != "undefined")
         return data["sort_name"] + " : " + data["email"];
@@ -41,7 +41,7 @@ EOD;
   $content = str_replace ("#sort_name_navigation","#disabled_by_qloockup",$content).$str;
 }
 
-function  qlookup_civicrm_contactListQuery ( &$query, $name, $context, $id ) {
+function  aaqlookup_civicrm_contactListQuery ( &$query, $name, $context, $id ) {
   //@TODO
   // search on the email if name contains @
   // if name contains a space, split, sort the word(s) by length and select smaller from select longer 

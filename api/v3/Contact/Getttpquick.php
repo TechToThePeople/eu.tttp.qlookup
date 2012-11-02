@@ -1,7 +1,11 @@
 <?php
 
 /**
- * An example API call
+ * This is an optimised search for autocomplete. 
+ * Its goal is to find the 15 best answers for the query as fast as possible. 
+ * As opposed to the default search for autocomplete, it searches first for names that *starts* with the query, and only if it doesn't work search for the query in the middle of the names. 
+ * Beside being much faster, it tend to returns more relevant results
+ * It tries first to search using fast queries and only when it doesn't get enough results tries more expensive queries
  *
  * @param array $params
  * @return array API result descriptor
@@ -9,7 +13,7 @@
  * @see civicrm_api3_create_error
  * @throws API_Exception
  */
-function civicrm_api3_contact_getgoodquick($params) {
+function civicrm_api3_contact_getttpquick($params) {
   $result = array();
   $fastSearchLimit = 2;
 
