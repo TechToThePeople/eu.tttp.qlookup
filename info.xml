@@ -4,9 +4,16 @@
   <name>quick lookup for the autocomplete in the navigation</name>
   <description>
 This extension improves the default search in several ways:
-- more efficient requests
-- search in the start of the names not in the middle (first or last)
-- adjust based on the lenght of the query and the number of results to do the query(ies) that are the most efficient
+- more efficient and faster requests
+- search in the start of the names not in the middle (first or last).
+- adjust the queries based on the number of results. The aim is to provide the most relevant results at the top, all the time
+- you can enter the contact id and it will go directly to the contact page
+
+Just try it, you will like it;)
+
+Current limitations: 
+- the result only includes the name and email. The address and phones are skipped for performance reasons. Shouldn't be too complicated to add them
+- the query always searches all the contacts and ignores ACL. 
   </description>
   <license>aGPL3</license>
   <maintainer>

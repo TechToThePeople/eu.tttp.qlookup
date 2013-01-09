@@ -20,6 +20,9 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
   $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1')."&cid=";
   $str = 
 <<<'EOD'
+<style>
+.ac_results span.email {display:block;float:right;padding_left:10px;}
+</style>
 <script>
 (function($,url){
   $(function(){
@@ -28,7 +31,7 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
       width:450,
       formatItem:function(data,i,max,value,term) {
         if (typeof data["email"] != "undefined")
-          return data["sort_name"] + " : " + data["email"];
+          return data["sort_name"] + "<span class='email'>" + data["email"]+"</span>";
         else
           return data["sort_name"];
       },
