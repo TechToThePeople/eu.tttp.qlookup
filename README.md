@@ -11,7 +11,9 @@ If you search for a number (eg. 42) it won't find any contact, but if you press 
 It will not waste resources searching for the first 2 chars, so you won't get all the "x", then all the "xa" before getting all the "xav". 3 letters seems to be the right lenght for my users (between 3k and 100k contacts).
 
 ## Implementation ##
-The existing hook for the autocomplete is at the database level. 
-This means that it either forces you to create a tempory table or to limit yourself to a single query.
+The existing hook for the autocomplete is at the database level.  This means that it either forces you to create a tempory table or to limit yourself to a single query.
 
 This extension creates a new getttpquick API action, that is used instead of the default autocomplete. This leverage the existing crmAutocomplete javascript.
+
+## Adjust the width ##
+If < 4.2.8 and if you want to adjust the width of the result, you need to apply this patch CRM-11624 the http://issues.civicrm.org/jira/secure/attachment/18970/setwidth.patch 

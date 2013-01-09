@@ -4,15 +4,17 @@
   <name>quick lookup for the autocomplete in the navigation</name>
   <description>
 This extension improves the default search in several ways:
-- more efficient and faster requests
+- avoid "pointless" requests by waiting at least 3 chars
+- more efficient and faster requests (optimised sql)
 - search in the start of the names not in the middle (first or last).
 - adjust the queries based on the number of results. The aim is to provide the most relevant results at the top, all the time
 - you can enter the contact id and it will go directly to the contact page
+- improved presentation of the results
 
 Just try it, you will like it;)
 
 Current limitations: 
-- the result only includes the name and email. The address and phones are skipped for performance reasons. Shouldn't be too complicated to add them
+- the result only includes the name and email. The address and phones are skipped for performance reasons. Shouldn't be too complicated to add them (hint, hint)
 - the query always searches all the contacts and ignores ACL. 
   </description>
   <license>aGPL3</license>
@@ -21,7 +23,7 @@ Current limitations:
     <email>civicrm@tttp.eu</email>
   </maintainer>
   <releaseDate>2012-10-28</releaseDate>
-  <version>1.0</version>
+  <version>1.1</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>4.2</ver>
