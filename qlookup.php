@@ -12,8 +12,6 @@ function qlookup_civicrm_config(&$config) {
  * Alter fields for an event registration to make them into a demo form.
  */
 function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object ) {
-//print_r($object);
-//die ($context);
   $pos = strpos($content, "#sort_name_navigation");
   if ($pos === false) {
     return;//no navigation menu
@@ -27,6 +25,7 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
   $(function(){
     $("#sort_name_navigation").crmAutocomplete({action:"getttpquick"}, {
       minChars:3,
+      width:450,
       formatItem:function(data,i,max,value,term) {
         if (typeof data["email"] != "undefined")
           return data["sort_name"] + " : " + data["email"];
