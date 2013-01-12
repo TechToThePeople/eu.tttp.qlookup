@@ -1,5 +1,12 @@
 <?php
 
+function _civicrm_api3_contact_getttpquick_spec(&$params) {
+  $params['name']['api.aliases'] = array('sort_name');
+  $params['name']['api.required'] = 1;
+  $params['with_email_only']['api.default'] = false;
+  $params['fastSearchLimit']['api.default'] = 2;
+}
+
 /**
  * This is an optimised search for autocomplete. 
  * Its goal is to find the 15 best answers for the query as fast as possible. 
@@ -15,10 +22,11 @@
  */
 function civicrm_api3_contact_getttpquick($params) {
   $result = array();
-  $fastSearchLimit = 2;
+  $name = mysql_real_escape_string ($params['name']);
 
-  if (strlen ($name) < $fastSearchLimit) { // start with a quick and dirty
-    $sql = "SELECT id, sort_name FROM civicrm_contact WHERE is_deleted=0 AND sort_name LIKE '{$params['name']}%' ORDER BY sort_name LIMIT 15";
+  if (!$params['with_email_only'] &&  strlen ($name) < $params['fastSearchLimit']) { // start with a quick and dirty
+
+    $sql = "SELECT id, sort_name FROM civicrm_contact WHERE is_deleted=0 AND sort_name LIKE '$name%' ORDER BY sort_name LIMIT 15";
     $dao = CRM_Core_DAO::executeQuery($sql);
     if($dao->N == 15) { 
       while($dao->fetch()) {
@@ -28,16 +36,23 @@ function civicrm_api3_contact_getttpquick($params) {
     }
   }
   // search on name and first name
+  if ($params['with_email_only']) 
+    $join = "JOIN";
+  else 
+    $join = "LEFT JOIN";
+
   $sql = "
     SELECT civicrm_contact.id, sort_name, email
     FROM civicrm_contact 
-    LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
-    WHERE (first_name LIKE '{$params['name']}%' OR sort_name LIKE '{$params['name']}%')
+    $join civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
+    WHERE (first_name LIKE '$name%' OR sort_name LIKE '$name%')
     AND is_deleted = 0
     ORDER BY sort_name LIMIT 25";
   $dao = CRM_Core_DAO::executeQuery($sql);
   while($dao->fetch()) {
-    $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name, 'email'=> $dao->email);
+    $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+    if (!empty($dao->email)) 
+      $result[$dao->id]['email'] = $dao->email;
   }
 
  // if matches found less than 15, try to match from email table 
@@ -47,14 +62,16 @@ function civicrm_api3_contact_getttpquick($params) {
     $sql = " 
       SELECT contact_id as id, sort_name, email 
       FROM civicrm_email, civicrm_contact
-      WHERE email LIKE '{$params['name']}%' 
+      WHERE email LIKE '$name%' 
       AND civicrm_email.contact_id = civicrm_contact.id
       AND is_deleted = 0
       ORDER BY sort_name  
       LIMIT $limit"; 
     $dao = CRM_Core_DAO::executeQuery($sql); 
     while($dao->fetch()) {
-      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name, "email"=> $dao->email);
+      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+      if (!empty($dao->email)) 
+        $result[$dao->id]['email'] = $dao->email;
     }
   }
   if (count ($result)<15) { // scrapping the %bottom%
@@ -62,12 +79,14 @@ function civicrm_api3_contact_getttpquick($params) {
       SELECT civicrm_contact.id, sort_name, email
       FROM civicrm_contact 
       LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
-      WHERE (sort_name LIKE '%{$params['name']}%')
+      WHERE (sort_name LIKE '%$name%')
       AND is_deleted = 0
       ORDER BY sort_name LIMIT ". (25 - count ($result));
     $dao = CRM_Core_DAO::executeQuery($sql);
     while($dao->fetch()) {
-      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name, 'email'=> $dao->email);
+      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+      if (!empty($dao->email)) 
+        $result[$dao->id]['email'] = $dao->email;
     }
 
 
