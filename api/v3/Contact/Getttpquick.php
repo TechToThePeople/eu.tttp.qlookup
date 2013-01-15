@@ -5,6 +5,8 @@ function _civicrm_api3_contact_getttpquick_spec(&$params) {
   $params['name']['api.required'] = 1;
   $params['with_email_only']['api.default'] = false;
   $params['fastSearchLimit']['api.default'] = 2;
+  $params['option_limit']['api.default'] = 20;
+  $params['return']['api.default'] = "sort_name,email";
 }
 
 /**
@@ -23,12 +25,25 @@ function _civicrm_api3_contact_getttpquick_spec(&$params) {
 function civicrm_api3_contact_getttpquick($params) {
   $result = array();
   $name = mysql_real_escape_string ($params['name']);
-
+  $N= $params["option_limit"];
+  if (!is_numeric($N)) throw new Exception("invalid option.limit value");
+  if ($N>999) $N=999;
+  $return_array = split (",", mysql_real_escape_string($params["return"]));
+  $fields = civicrm_api("contact","getfields",array("version"=>3));
+  unset($fields["value"]["api_key"]); // security blacklist
+  unset($fields["value"]["id"]); // security blacklist
+  $fields = $fields['values'];
+  $fields["email"]=1;
+  foreach ($return_array as $k => &$v) {
+    if (!array_key_exists($v,$fields))
+       unset($return_array[$k]);
+  }
+  $return = "civicrm_contact.id, email, ". implode (",",$return_array);
   if (!$params['with_email_only'] &&  strlen ($name) < $params['fastSearchLimit']) { // start with a quick and dirty
 
-    $sql = "SELECT id, sort_name FROM civicrm_contact WHERE is_deleted=0 AND sort_name LIKE '$name%' ORDER BY sort_name LIMIT 15";
+    $sql = "SELECT id, sort_name FROM civicrm_contact WHERE is_deleted=0 AND sort_name LIKE '$name%' ORDER BY sort_name LIMIT $N";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    if($dao->N == 15) { 
+    if($dao->N == $N) { 
       while($dao->fetch()) {
         $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
       }
@@ -42,25 +57,26 @@ function civicrm_api3_contact_getttpquick($params) {
     $join = "LEFT JOIN";
 
   $sql = "
-    SELECT civicrm_contact.id, sort_name, email
+    SELECT $return 
     FROM civicrm_contact 
     $join civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
     WHERE (first_name LIKE '$name%' OR sort_name LIKE '$name%')
     AND is_deleted = 0
-    ORDER BY sort_name LIMIT 25";
+    ORDER BY sort_name LIMIT $N";
   $dao = CRM_Core_DAO::executeQuery($sql);
   while($dao->fetch()) {
     $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
-    if (!empty($dao->email)) 
-      $result[$dao->id]['email'] = $dao->email;
+    foreach ($return_array as $r)
+      if (!empty($dao->$r)) 
+        $result[$dao->id][$r] = $dao->$r;
   }
 
  // if matches found less than 15, try to match from email table 
-  if($dao->N < 15) { 
-    $limit = 25 - $dao->N;
+  if($dao->N < $N) { 
+    $limit = $N - $dao->N;
     // find the match from email table 
     $sql = " 
-      SELECT contact_id as id, sort_name, email 
+      SELECT $return 
       FROM civicrm_email, civicrm_contact
       WHERE email LIKE '$name%' 
       AND civicrm_email.contact_id = civicrm_contact.id
@@ -70,23 +86,25 @@ function civicrm_api3_contact_getttpquick($params) {
     $dao = CRM_Core_DAO::executeQuery($sql); 
     while($dao->fetch()) {
       $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
-      if (!empty($dao->email)) 
-        $result[$dao->id]['email'] = $dao->email;
+      foreach ($return_array as $r)
+        if (!empty($dao->$r)) 
+          $result[$dao->id][$r] = $dao->$r;
     }
   }
-  if (count ($result)<15) { // scrapping the %bottom%
+  if (count ($result)<$N) { // scrapping the %bottom%
     $sql = "
-      SELECT civicrm_contact.id, sort_name, email
+      SELECT $return 
       FROM civicrm_contact 
       LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
       WHERE (sort_name LIKE '%$name%')
       AND is_deleted = 0
-      ORDER BY sort_name LIMIT ". (25 - count ($result));
+      ORDER BY sort_name LIMIT ". ($N - count ($result));
     $dao = CRM_Core_DAO::executeQuery($sql);
     while($dao->fetch()) {
       $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
-      if (!empty($dao->email)) 
-        $result[$dao->id]['email'] = $dao->email;
+      foreach ($return_array as $r)
+        if (!empty($dao->$r)) 
+          $result[$dao->id][$r] = $dao->$r;
     }
 
 
