@@ -25,8 +25,12 @@ Current limitations:
   <releaseDate>2012-10-28</releaseDate>
   <version>1.1</version>
   <develStage>stable</develStage>
+<urls><url desc="Main Extension Page">http://github.com/TechToThePeople/eu.tttp.qlookup</url><url desc="Documentation">http://github.com/TechToThePeople/eu.tttp.qlookup</url><url desc="Support">http://forum.civicrm.org</url><url desc="Licensing">http://civicrm.org/licensing</url></urls>
+
   <compatibility>
+    <ver>4.1</ver>
     <ver>4.2</ver>
+    <ver>4.3</ver>
   </compatibility>
   <civix>
     <namespace>CRM/Qlookup</namespace>
