@@ -38,10 +38,18 @@ function civicrm_api3_contact_getttpquick($params) {
     if (!array_key_exists($v,$fields))
        unset($return_array[$k]);
   }
+  require_once 'CRM/Contact/BAO/Contact/Permission.php';
+  list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
+
+  if ($aclWhere) {
+    $where = " AND $aclWhere ";
+  }
+
+
   $return = "civicrm_contact.id, email, ". implode (",",$return_array);
   if (!$params['with_email_only'] &&  strlen ($name) < $params['fastSearchLimit']) { // start with a quick and dirty
 
-    $sql = "SELECT id, sort_name FROM civicrm_contact WHERE is_deleted=0 AND sort_name LIKE '$name%' ORDER BY sort_name LIMIT $N";
+    $sql = "SELECT civicrm_contact.id, sort_name FROM civicrm_contact $aclFrom WHERE $aclWhere AND sort_name LIKE '$name%' ORDER BY sort_name LIMIT $N";
     $dao = CRM_Core_DAO::executeQuery($sql);
     if($dao->N == $N) { 
       while($dao->fetch()) {
@@ -58,10 +66,10 @@ function civicrm_api3_contact_getttpquick($params) {
 
   $sql = "
     SELECT $return 
-    FROM civicrm_contact 
+    FROM civicrm_contact $aclFrom
     $join civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
     WHERE (first_name LIKE '$name%' OR sort_name LIKE '$name%')
-    AND is_deleted = 0
+    AND $aclWhere 
     ORDER BY sort_name LIMIT $N";
   $dao = CRM_Core_DAO::executeQuery($sql);
   while($dao->fetch()) {
@@ -77,10 +85,10 @@ function civicrm_api3_contact_getttpquick($params) {
     // find the match from email table 
     $sql = " 
       SELECT $return 
-      FROM civicrm_email, civicrm_contact
+      FROM civicrm_email, civicrm_contact $aclFrom
       WHERE email LIKE '$name%' 
       AND civicrm_email.contact_id = civicrm_contact.id
-      AND is_deleted = 0
+      AND $aclWhere 
       ORDER BY sort_name  
       LIMIT $limit"; 
     $dao = CRM_Core_DAO::executeQuery($sql); 
@@ -94,10 +102,28 @@ function civicrm_api3_contact_getttpquick($params) {
   if (count ($result)<$N) { // scrapping the %bottom%
     $sql = "
       SELECT $return 
-      FROM civicrm_contact 
+      FROM civicrm_contact $aclFrom
       LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
       WHERE (sort_name LIKE '%$name%')
-      AND is_deleted = 0
+      AND $aclWhere 
+      ORDER BY sort_name LIMIT ". ($N - count ($result));
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while($dao->fetch()) {
+      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+      foreach ($return_array as $r)
+        if (!empty($dao->$r)) 
+          $result[$dao->id][$r] = $dao->$r;
+    }
+  }
+ 
+  if (count ($result)<$N && (strpos($name,".") !== false || strpos($name,"@"))) {
+    // fetching on %email% if the string contains @ or . 
+    $sql = "
+      SELECT $return 
+      FROM civicrm_contact $aclFrom
+      LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
+      WHERE (email LIKE '%$name%')
+      AND $aclWhere 
       ORDER BY sort_name LIMIT ". ($N - count ($result));
     $dao = CRM_Core_DAO::executeQuery($sql);
     while($dao->fetch()) {
@@ -107,8 +133,8 @@ function civicrm_api3_contact_getttpquick($params) {
           $result[$dao->id][$r] = $dao->$r;
     }
 
-
   }
-  return civicrm_api3_create_success($result, $params, 'Contact', 'getgoodquick');
+
+  return civicrm_api3_create_success($result, $params, 'Contact', 'getttpquick');
 }
 

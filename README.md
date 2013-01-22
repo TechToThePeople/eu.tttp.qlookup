@@ -10,6 +10,7 @@ If you search for a number (eg. 42) it won't find any contact, but if you press 
 
 It will not waste resources searching for the first 2 chars, so you won't get all the "x", then all the "xa" before getting all the "xav". 3 letters seems to be the right lenght for my users (between 3k and 100k contacts).
 
+if you type @gmai or .com it will seek them in the email
 ## Implementation ##
 The existing hook for the autocomplete is at the database level.  This means that it either forces you to create a tempory table or to limit yourself to a single query.
 
