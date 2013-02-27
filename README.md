@@ -1,7 +1,7 @@
 This extension improves the default search in several ways:
 - more efficient requests
 - search in the start of the names instead of in the middle (first or last)
-- adjust based on the lenght of the query and the number of results to do the query(ies) that are the most efficient
+- adjust based on the length of the query and the number of results to do the query(ies) that are the most efficient
 
 Give it a go and let me know what you think of the result.
 
@@ -14,7 +14,7 @@ if you type @gmai or .com it will seek them in the email
 ## Implementation ##
 The existing hook for the autocomplete is at the database level.  This means that it either forces you to create a tempory table or to limit yourself to a single query.
 
-This extension creates a new getttpquick API action, that is used instead of the default autocomplete. This leverage the existing crmAutocomplete javascript.
+This extension creates a new getttpquick API action, that is used instead of the default autocomplete. This leverages the existing crmAutocomplete javascript.
 
 ## Adjust the width ##
 If < 4.2.8 and if you want to adjust the width of the result, you need to apply this patch CRM-11624 the http://issues.civicrm.org/jira/secure/attachment/18970/setwidth.patch 
