@@ -26,6 +26,7 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
 <script>
 (function($,url){
   $(function(){
+    $(".crm-quickSearchField").closest("ul").remove();
     $("#sort_name_navigation").crmAutocomplete({action:"getttpquick"}, {
       minChars:3,
       width:450,
