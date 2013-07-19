@@ -29,6 +29,9 @@ function civicrm_api3_contact_getttpquick($params) {
   if (!is_numeric($N)) throw new Exception("invalid option.limit value");
   if ($N>999) $N=999;
   $return_array = explode(",", mysql_real_escape_string($params["return"]));
+  if (!$return_array[0]) { // for some reasons, escape doesn't always work (lost mysql connection?)
+     $return_array = array ("sort_name","email");
+   }
   $fields = civicrm_api("contact","getfields",array("version"=>3));
   unset($fields["value"]["api_key"]); // security blacklist
   unset($fields["value"]["id"]); // security blacklist
