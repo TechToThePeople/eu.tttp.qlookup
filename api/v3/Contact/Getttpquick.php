@@ -82,18 +82,37 @@ function civicrm_api3_contact_getttpquick($params) {
         $result[$dao->id][$r] = $dao->$r;
   }
 
- // if matches found less than 15, try to match from email table 
+ // if matches found less than 15, try to find more 
   if($dao->N < $N) { 
     $limit = $N - $dao->N;
-    // find the match from email table 
-    $sql = " 
-      SELECT $return 
-      FROM civicrm_email, civicrm_contact $aclFrom
-      WHERE email LIKE '$name%' 
-      AND civicrm_email.contact_id = civicrm_contact.id
-      AND $aclWhere 
-      ORDER BY sort_name  
-      LIMIT $limit"; 
+    if (strpos ($name," ") === false) {
+      // find the match from email table 
+      $sql = " 
+        SELECT $return 
+        FROM civicrm_email, civicrm_contact $aclFrom
+        $join civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
+        WHERE email LIKE '$name%' 
+        AND civicrm_email.contact_id = civicrm_contact.id
+        AND $aclWhere 
+        ORDER BY sort_name  
+        LIMIT $limit"; 
+      } else {
+        $names= explode (" ", $name);
+        if (count($names)>2) {
+          $where = " WHERE display_name LIKE '%$name%'";
+        } else {
+          $where = " WHERE sort_name LIKE '{$names[0]}, {$names[1]}%' OR sort_name LIKE '{$names[1]}%, {$names[0]}' ";
+        }
+        $sql = " 
+          SELECT $return 
+          FROM civicrm_contact $aclFrom
+          $join civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
+          $where  
+          AND $aclWhere 
+          ORDER BY sort_name  
+          LIMIT $limit"; 
+        
+    }
     $dao = CRM_Core_DAO::executeQuery($sql); 
     while($dao->fetch()) {
       $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);

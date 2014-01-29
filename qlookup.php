@@ -1,5 +1,4 @@
 <?php
-
 require_once 'qlookup.civix.php';
 /**
  * Implementation of hook_civicrm_config
