@@ -101,6 +101,7 @@ function civicrm_api3_contact_getttpquick($params) {
         } else {
           $where = " WHERE sort_name LIKE '{$names[0]}, {$names[1]}%' OR sort_name LIKE '{$names[1]}%, {$names[0]}' ";
         }
+      } else {
         $sql = " 
           SELECT $return 
           FROM civicrm_contact $aclFrom
@@ -109,9 +110,9 @@ function civicrm_api3_contact_getttpquick($params) {
           AND $aclWhere 
           ORDER BY sort_name  
           LIMIT $limit"; 
-        
     }
     $dao = CRM_Core_DAO::executeQuery($sql); 
+die ($sql);
     while($dao->fetch()) {
       $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
       foreach ($return_array as $r)
