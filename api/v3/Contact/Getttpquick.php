@@ -90,13 +90,11 @@ function civicrm_api3_contact_getttpquick($params) {
       $sql = " 
         SELECT $return 
         FROM civicrm_email, civicrm_contact $aclFrom
-        $join civicrm_email ON civicrm_email.contact_id = civicrm_contact.id 
         WHERE email LIKE '$name%' 
         AND civicrm_email.contact_id = civicrm_contact.id
         AND $aclWhere 
         ORDER BY sort_name  
         LIMIT $limit"; 
-      } else {
         $names= explode (" ", $name);
         if (count($names)>2) {
           $where = " WHERE display_name LIKE '%$name%'";
