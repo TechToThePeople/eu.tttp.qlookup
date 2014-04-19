@@ -17,6 +17,7 @@ function qlookup_civicrm_alterContent( &$content, $context, $tplName, &$object )
   }
 
   $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1')."&cid=";
+  $url = str_replace('&amp;', '&', $url);
   $str = 
 <<<'EOD'
 <style>

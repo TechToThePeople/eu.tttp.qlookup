@@ -4,7 +4,7 @@ function _civicrm_api3_contact_getttpquick_spec(&$params) {
   $params['name']['api.aliases'] = array('sort_name');
   $params['name']['api.required'] = 1;
   $params['with_email_only']['api.default'] = false;
-  $params['fastSearchLimit']['api.default'] = 2;
+  $params['fastSearchLimit']['api.default'] = 1;
   $params['option_limit']['api.default'] = 20;
   $params['return']['api.default'] = "sort_name,email";
 }
