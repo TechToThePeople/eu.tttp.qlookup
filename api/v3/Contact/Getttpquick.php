@@ -76,7 +76,7 @@ function civicrm_api3_contact_getttpquick($params) {
     ORDER BY sort_name LIMIT $N";
   $dao = CRM_Core_DAO::executeQuery($sql);
   while($dao->fetch()) {
-    $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+    $result[$dao->id] = array ('id'=>$dao->id, "sort_name"=>$dao->sort_name);
     foreach ($return_array as $r)
       if (!empty($dao->$r)) 
         $result[$dao->id][$r] = $dao->$r;
