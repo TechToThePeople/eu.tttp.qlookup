@@ -1,7 +1,7 @@
 <?php
 
 function _civicrm_api3_contact_getttpquick_spec(&$params) {
-  $params['name']['api.aliases'] = array('sort_name');
+  $params['name']['api.aliases'] = ['sort_name'];
   $params['name']['api.required'] = 1;
   $params['with_email_only']['api.default'] = false;
   $params['fastSearchLimit']['api.default'] = 1;
@@ -23,16 +23,16 @@ function _civicrm_api3_contact_getttpquick_spec(&$params) {
  * @throws API_Exception
  */
 function civicrm_api3_contact_getttpquick($params) {
-  $result = array();
+  $result = [];
   $name = mysql_real_escape_string ($params['name']);
   $N= $params["option_limit"];
   if (!is_numeric($N)) throw new Exception("invalid option.limit value");
   if ($N>999) $N=999;
   $return_array = explode(",", mysql_real_escape_string($params["return"]));
   if (!$return_array[0]) { // for some reasons, escape doesn't always work (lost mysql connection?)
-     $return_array = array ("sort_name","email");
+     $return_array = ["sort_name","email"];
    }
-  $fields = civicrm_api("contact","getfields",array("version"=>3));
+  $fields = civicrm_api("contact","getfields",["version"=>3]);
   unset($fields["value"]["api_key"]); // security blacklist
   unset($fields["value"]["id"]); // security blacklist
   $fields = $fields['values'];
@@ -56,7 +56,7 @@ function civicrm_api3_contact_getttpquick($params) {
     $dao = CRM_Core_DAO::executeQuery($sql);
     if($dao->N == $N) { 
       while($dao->fetch()) {
-        $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+        $result[$dao->id] = [id=>$dao->id, "sort_name"=>$dao->sort_name];
       }
       return civicrm_api3_create_success($result, $params, 'Contact', 'getgoodquick');
     }
@@ -76,7 +76,7 @@ function civicrm_api3_contact_getttpquick($params) {
     ORDER BY sort_name LIMIT $N";
   $dao = CRM_Core_DAO::executeQuery($sql);
   while($dao->fetch()) {
-    $result[$dao->id] = array ('id'=>$dao->id, "sort_name"=>$dao->sort_name);
+    $result[$dao->id] = ['id'=>$dao->id, "sort_name"=>$dao->sort_name];
     foreach ($return_array as $r)
       if (!empty($dao->$r)) 
         $result[$dao->id][$r] = $dao->$r;
@@ -113,7 +113,7 @@ function civicrm_api3_contact_getttpquick($params) {
       }
       $dao = CRM_Core_DAO::executeQuery($sql); 
     while($dao->fetch()) {
-      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+      $result[$dao->id] = [id=>$dao->id, "sort_name"=>$dao->sort_name];
       foreach ($return_array as $r)
         if (!empty($dao->$r)) 
           $result[$dao->id][$r] = $dao->$r;
@@ -129,7 +129,7 @@ function civicrm_api3_contact_getttpquick($params) {
       ORDER BY sort_name LIMIT ". ($N - count ($result));
     $dao = CRM_Core_DAO::executeQuery($sql);
     while($dao->fetch()) {
-      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+      $result[$dao->id] = [id=>$dao->id, "sort_name"=>$dao->sort_name];
       foreach ($return_array as $r)
         if (!empty($dao->$r)) 
           $result[$dao->id][$r] = $dao->$r;
@@ -147,7 +147,7 @@ function civicrm_api3_contact_getttpquick($params) {
       ORDER BY sort_name LIMIT ". ($N - count ($result));
     $dao = CRM_Core_DAO::executeQuery($sql);
     while($dao->fetch()) {
-      $result[$dao->id] = array (id=>$dao->id, "sort_name"=>$dao->sort_name);
+      $result[$dao->id] = [id=>$dao->id, "sort_name"=>$dao->sort_name];
       foreach ($return_array as $r)
         if (!empty($dao->$r)) 
           $result[$dao->id][$r] = $dao->$r;
