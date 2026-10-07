@@ -41,7 +41,6 @@ function civicrm_api3_contact_getttpquick($params) {
     if (!array_key_exists($v,$fields))
        unset($return_array[$k]);
   }
-  require_once 'CRM/Contact/BAO/Contact/Permission.php';
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
 
   if ($aclWhere) {
